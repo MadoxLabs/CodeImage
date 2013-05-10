@@ -1,0 +1,71 @@
+<html>
+<head>
+  <script>
+    function decode() {
+      var source = document.getElementById('source');
+      var img = document.createElement('canvas');
+      img.width = source.clientWidth;
+      img.height = source.clientHeight;
+      var context = img.getContext('2d');
+      context.drawImage(source, 0, 0);
+      var map = context.getImageData(0, 0, img.width, img.height);
+      var len = map.data.length;
+      var txt = "";
+      var j = 0;
+      var i = 0;
+      for (i = 0; i < len; i++) {
+        if (j == 3) { j = 0; continue; }
+        if (map.data[i] === 0) break;
+        txt += String.fromCharCode(map.data[i]);
+        ++j;
+      }
+
+      // OMIT the rest if you are not embedding images
+
+      // then there is a header
+      var header = "";
+      ++j;
+      if (j == 3) j = 0;
+      for (i++; i < len; i++)
+      {
+        if (j == 3) { j = 0; continue; }
+        if (map.data[i] === 0) break;
+        header += String.fromCharCode(map.data[i]);
+        ++j;
+      }
+      for (; j < 4; ++j) ++i;
+
+      // the rest is images
+      var di = document.getElementById('decodeimages');
+
+      var headerdata = JSON.parse(header);
+      for (var j in headerdata)
+      {
+        len = headerdata[j].width * headerdata[j].height*4;
+        var data = [];
+        for (var x = 0; x < len; ++x) data[x] = map.data[i++];
+        var img = document.createElement('canvas');
+        img.width = headerdata[j].width;
+        img.height = headerdata[j].height;
+        var context = img.getContext('2d');
+        var map2 = context.createImageData(img.width, img.height);
+        map2.data.set(data);
+        context.putImageData(map2, 0, 0, 0, 0, img.width, img.height);
+
+        // DO SOMETHING with the images here. This code just outputs images.
+
+        var save2 = document.createElement('img');
+        save2.src = img.toDataURL("image/png");
+        di.appendChild(save2);
+      }
+
+      eval(txt);
+      main();
+    }
+  </script>
+</head>
+<body onload="decode();">
+  <image id="source" src="example.png"></image>
+  <canvas id="view" width=500 height=500><br>
+</body>
+</html>
