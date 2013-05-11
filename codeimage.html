@@ -58,42 +58,8 @@
          ++skip;
          if (skip == 3) { skip = 0; data[j++] = 255; }
 
-         // image header
-         var header = [];
-         for (var i in images)
-         {
-           var src = images[i];
-           var o = { width: src.clientWidth, height: src.clientHeight };
-           header.push(o);
-         }
-         var h = JSON.stringify(header);
-         len = h.length;
-         for (var i = 0; i < len; ++i)
-         {
-           data[j++] = (h.charCodeAt(i));
-           ++skip;
-           if (skip == 3) { skip = 0; data[j++] = 255; }
-         }
-         data[j++] = 0;
-         ++skip;
-
-         // images gotta start on an R
-         for (; skip < 4; ++skip) data[j++] = 255;
-
          // load all image data
          var img = document.createElement('canvas'); // document.getElementById('surface');
-         for (var i in images)
-         {
-           var src = images[i]; //document.getElementById(images[i]);
-           img.width = src.clientWidth;
-           img.height = src.clientHeight;
-           var context = img.getContext('2d');
-           context.drawImage(src, 0, 0);
-           var map = context.getImageData(0, 0, img.width, img.height);
-           var len = map.data.length;
-           for (var x = 0; x < len; ++x) data[j++] = map.data[x];
-         }
-
          var width = (Math.sqrt(j / 4) | 0) + 1;
          for (var i = j; i < width * width * 4; ++i) data[i] = 0;
 
@@ -128,19 +94,6 @@
            txt += String.fromCharCode(map.data[i]);
            ++j;
          }
-
-         // then there is a header
-         var header = "";
-         ++j;
-         if (j == 3) j = 0;
-         for (i++; i < len; i++)
-         {
-           if (j == 3) { j = 0; continue; }
-           if (map.data[i] === 0) break;
-           header += String.fromCharCode(map.data[i]);
-           ++j;
-         }
-         for (; j < 4; ++j) ++i;
 
          return txt;
        }
