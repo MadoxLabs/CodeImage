@@ -1,0 +1,115 @@
+<html>
+  <body>
+
+    <table><tr><td>Raw source code</td></tr>
+    <tr><td><textarea id="code" rows="10" cols="40"></textarea></td></tr></table>
+    <br />
+
+    Commands:<br />
+    <input type="button" value="Encode" onClick="process();" />
+    <br />
+
+    Result:<br />
+    <div><image id='save'></div>
+
+    <div id="script">
+      <script type="text/javascript">
+
+        var sourcecode = "";
+        var images = [];
+        var num = 0;
+        var socket;
+
+        function process()
+        {
+          var code = document.getElementById("code");
+          sourcecode += code.value + "\n";
+          encode(sourcecode);
+        }
+
+        function unprocess()
+        {
+          var out = document.getElementById("out");
+          out.value = decode();
+        }
+
+        function encode(txt)
+        {
+          var len = txt.length;
+          var data = [];
+          var j = 0;
+          var linecomment = false;
+          var blockcomment = false;
+          var space = false;
+          var skip = 0;
+          for (var i = 0; i < len; ++i)
+          {
+            if (blockcomment) { if (txt.charAt(i) == '*' && txt.charAt(i + 1) == '/') blockcomment = false; ++i; continue; }
+            if (linecomment) { if (txt.charAt(i) == '\n') linecomment = false; continue; }
+            if (txt.charAt(i) == '/' && txt.charAt(i + 1) == '/') { linecomment = true; continue; }
+            else if (txt.charAt(i) == '/' && txt.charAt(i + 1) == '*') { blockcomment = true; continue; }
+            if (txt.charAt(i) == ' ') { if (!space) space = true; else continue; }
+            else if (space) space = false;
+            data[j++] = (txt.charCodeAt(i));
+            ++skip;
+            if (skip == 3) { skip = 0; data[j++] = 255; }
+          }
+          data[j++] = 0;
+          ++skip;
+          if (skip == 3) { skip = 0; data[j++] = 255; }
+
+          // load all image data
+          var img = document.createElement('canvas'); // document.getElementById('surface');
+          var width = (Math.sqrt(j / 4) | 0) + 1;
+          for (var i = j; i < width * width * 4; ++i) data[i] = 0;
+
+          img.width = width;
+          img.height = width;
+          var context = img.getContext('2d');
+          var map = context.createImageData(width, width);
+          map.data.set(data);
+          context.putImageData(map, 0, 0, 0, 0, width, width);
+
+          var save = document.getElementById('save');
+          save.src = img.toDataURL("image/png");
+        }
+
+        function decode()
+        {
+          var save = document.getElementById('save');
+          var img = document.createElement('canvas'); // document.getElementById('surface');
+          img.width = save.clientWidth;
+          img.height = save.clientHeight;
+          var context = img.getContext('2d');
+          context.drawImage(save, 0, 0);
+          var map = context.getImageData(0, 0, img.width, img.height);
+          var len = map.data.length;
+          var txt = "";
+          var j = 0;
+          var i = 0;
+          for (i = 0; i < len; i++)
+          {
+            if (j == 3) { j = 0; continue; }
+            if (map.data[i] === 0) break;
+            txt += String.fromCharCode(map.data[i]);
+            ++j;
+          }
+
+          return txt;
+        }
+
+        function main()
+        {
+        }
+
+     </script>
+    </div>
+    <br />
+    <hr />
+    <input type="button" value="Decode Test" onClick="unprocess();" /><br />
+    Decoded javascript appears here:<br>
+    <textarea id=out rows=8 cols=80></textarea>
+    <br />
+
+  </body>
+</html>
