@@ -14,6 +14,7 @@ use it in your own project. It contains your code. You can test the image using 
 decode the iamge and show the result. It should match the input.
 
 codeimage-example.html
+
 example.png
 
 This page shows you how to load your codeimage and run it. THe decode function needs to know the id of the 
@@ -22,6 +23,7 @@ This assumes that your codeimage contains a function called main(). You cna chan
 codeimage draws random rects on the canvas.
 
 codeimage-nodeclient.html
+
 codeimage-nodeserver.js
 
 This is the node.js version of the encoding tool. This version is the same as the codeimage.html page with the
