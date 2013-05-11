@@ -13,7 +13,7 @@ The encoding algoprithm can only handle text. A small image will appear after en
 use it in your own project. It contains your code. You can test the image using the decode button. This will
 decode the iamge and show the result. It should match the input.
 
-**codeimage-example.html**
+**codeimage-example.html**<br>
 **example.png**
 
 This page shows you how to load your codeimage and run it. THe decode function needs to know the id of the 
@@ -21,7 +21,7 @@ image object that contains the codeimage. The result after decoding is eval'ed a
 This assumes that your codeimage contains a function called main(). You cna change this as needed. THe example
 codeimage draws random rects on the canvas.
 
-**codeimage-nodeclient.html**
+**codeimage-nodeclient.html**<br>
 **codeimage-nodeserver.js**
 
 This is the node.js version of the encoding tool. This version is the same as the codeimage.html page with the
